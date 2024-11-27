@@ -75,6 +75,21 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             );
+          } else if (state is QuizCompleted) {
+            int totalScore = state.totalScored;
+            int totalAnswered = state.totalAnswered;
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Your total score is ${totalScore.toString()}"),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Text("Your total score is ${totalAnswered.toString()}"),
+                ],
+              ),
+            );
           } else if (state is QuizError) {
             return const Center(
               child: Text(
