@@ -1,45 +1,34 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
-import 'package:stream/data/quiz_data_model.dart';
+import 'package:flutter/material.dart';
+import 'package:stream/features/quiz/data/repositories/quiz_repos.dart';
+
+import '../../data/models/quiz_data_model.dart';
 
 part 'quiz_event.dart';
 part 'quiz_state.dart';
 
 class QuizBloc extends Bloc<QuizEvent, QuizState> {
+  late final QuizRepository _quizRepository = QuizRepository();
   QuizBloc() : super(QuizInitial()) {
     on<QuizEvent>(quizEvent);
     on<LoadQuizEvent>(loadQuizEvent);
     on<SelectAnsEvent>(selectAnsEvent);
     on<NextQuesEvent>(nextQuesEvent);
+    on<RestartQuizEvent>(restartQuizEvent);
+    on<SkipQuesEvent>(skipQuesEvent);
   }
 
   FutureOr<void> quizEvent(QuizEvent event, Emitter<QuizState> emit) {}
   FutureOr<void> loadQuizEvent(
       LoadQuizEvent event, Emitter<QuizState> emit) async {
     emit(QuizLoading());
-
     try {
-      var client = http.Client();
-
-      final response = await client.get(Uri.parse(
-          'https://opentdb.com/api.php?amount=10&category=12&type=multiple'));
-      if (response.statusCode == 200) {
-        print("Connection is OK");
-
-        final jsonData = jsonDecode(response.body);
-        final quizData = QuizData.fromJson(jsonData);
-
-        emit(QuizLoaded(
-            questions: quizData.results ?? [], currentIndex: 0, score: 0));
-      } else {
-        emit(QuizError(
-            errorMessage: "Unable to make connection ${response.statusCode}"));
-      }
+      final quizData = await _quizRepository.fetchQuizData();
+      emit(QuizLoaded(
+          questions: quizData.results ?? [], currentIndex: 0, score: 0));
     } catch (e) {
       emit(QuizError(errorMessage: "$e"));
     }
@@ -80,5 +69,35 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     }
   }
 
-  ///restart quiz logic could be written here
+  FutureOr<void> restartQuizEvent(
+      RestartQuizEvent event, Emitter<QuizState> emit) async {
+    emit(QuizLoading());
+    try {
+      final quizData = await _quizRepository.fetchQuizData();
+      emit(QuizLoaded(
+          questions: quizData.results ?? [], currentIndex: 0, score: 0));
+    } catch (e) {
+      emit(QuizError(errorMessage: "$e"));
+    }
+  }
+
+  FutureOr<void> skipQuesEvent(SkipQuesEvent event, Emitter<QuizState> emit) {
+    if (state is QuizLoaded) {
+      final currentState = state as QuizLoaded;
+      if (currentState.currentIndex < currentState.questions.length - 1) {
+        emit(QuizLoaded(
+            questions: currentState.questions,
+            currentIndex: currentState.currentIndex + 1,
+            score: currentState.score + 0));
+      } else {
+        final currentState = state as QuizLoaded;
+        final int totalScore = currentState.score;
+        emit(QuizCompleted(
+            totalScored: totalScore,
+            totalAnswered: currentState.questions.length));
+      }
+    } else {
+      emit(const QuizError(errorMessage: "Cannot skip to other question"));
+    }
+  }
 }

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'HomePage.dart';
-import 'bloc/quiz_bloc.dart';
+import 'features/authentication/presentation/pages/login_page.dart';
+import 'features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'features/quiz/presentation/pages/home_page.dart';
 
 void main() {
   runApp(
     BlocProvider(
       create: (context) => QuizBloc()..add(LoadQuizEvent()),
-      child: MaterialApp(home: HomePage()),
+      child: const MaterialApp(
+          debugShowCheckedModeBanner: false, home: LoginPage()),
     ),
   );
 }
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
