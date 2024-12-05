@@ -1,15 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stream/features/authentication/presentation/pages/login_page.dart';
 
-import 'bloc/quiz_bloc.dart'; // Import your QuizBloc, QuizEvent, and QuizState
+import '../bloc/quiz_bloc.dart';
 
 class HomePage extends StatelessWidget {
+  void _logout(BuildContext context) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    pref.setBool('isLoggedIn', false);
+
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Logged Out")));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quiz App'),
         centerTitle: true,
+        actions: [
+          ElevatedButton(
+              onPressed: () => _logout(context),
+              child: Icon(Icons.logout_sharp))
+        ],
       ),
       body: BlocBuilder<QuizBloc, QuizState>(
         builder: (context, state) {
@@ -23,7 +42,6 @@ class HomePage extends StatelessWidget {
               ...currentQuestion.incorrectAnswers!,
               currentQuestion.correctAnswer!
             ]..shuffle();
-
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -82,11 +100,18 @@ class HomePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Your total score is ${totalScore.toString()}"),
+                  Text("Your total score is ${totalScore * 10}"),
                   const SizedBox(
                     height: 40,
                   ),
-                  Text("Your total score is ${totalAnswered.toString()}"),
+                  Text("Max Score ${totalAnswered * 10}"),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  ElevatedButton(
+                      onPressed: () =>
+                          context.read<QuizBloc>().add(RestartQuizEvent()),
+                      child: Text("Restart Quiz"))
                 ],
               ),
             );
@@ -98,6 +123,7 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
+
           return const Center(child: Text('Quiz is over'));
         },
       ),

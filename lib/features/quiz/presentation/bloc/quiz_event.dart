@@ -18,3 +18,5 @@ final class SelectAnsEvent extends QuizEvent {
 }
 
 final class NextQuesEvent extends QuizEvent {}
+
+final class RestartQuizEvent extends QuizEvent {}

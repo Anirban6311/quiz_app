@@ -17,7 +17,7 @@ final class QuizLoaded extends QuizState {
   final int currentIndex;
   final int score;
 
-  QuizLoaded(
+  const QuizLoaded(
       {required this.questions,
       required this.currentIndex,
       required this.score});
@@ -30,7 +30,7 @@ final class QuizAnsChecked extends QuizState {
   final bool isCorrect;
   final QuizLoaded quizState;
 
-  QuizAnsChecked({required this.isCorrect, required this.quizState});
+  const QuizAnsChecked({required this.isCorrect, required this.quizState});
 
   List<Object?> get props => [isCorrect, quizState];
 }
@@ -39,7 +39,7 @@ final class QuizCompleted extends QuizState {
   final int totalScored;
   final int totalAnswered;
 
-  QuizCompleted({required this.totalScored, required this.totalAnswered});
+  const QuizCompleted({required this.totalScored, required this.totalAnswered});
 
   List<Object?> get props => [totalScored, totalAnswered];
 }
