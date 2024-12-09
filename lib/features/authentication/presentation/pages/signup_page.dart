@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
@@ -153,7 +152,8 @@ class _SignupPageState extends State<SignupPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => LoginPage(),
+                                          builder: (context) =>
+                                              const LoginPage(),
                                         ),
                                       );
                                     },
@@ -171,18 +171,6 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       ),
-    );
-  }
-
-  void ToastMessages(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.SNACKBAR,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
     );
   }
 }

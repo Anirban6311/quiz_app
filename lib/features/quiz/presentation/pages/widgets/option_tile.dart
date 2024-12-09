@@ -14,18 +14,17 @@ class OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return ElevatedButton(
+      onPressed: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue : Colors.grey[200],
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           option,
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 20, color: Colors.blue),
         ),
       ),
     );

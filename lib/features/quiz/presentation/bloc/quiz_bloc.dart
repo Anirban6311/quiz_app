@@ -88,8 +88,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         emit(QuizLoaded(
             questions: currentState.questions,
             currentIndex: currentState.currentIndex + 1,
-            score: currentState.score + 0));
-      } else {
+            score: currentState.score));
+      } else if (currentState.currentIndex ==
+          currentState.questions.length - 1) {
         final currentState = state as QuizLoaded;
         final int totalScore = currentState.score;
         emit(QuizCompleted(
