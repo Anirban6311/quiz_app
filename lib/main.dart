@@ -9,8 +9,7 @@ void main() {
   runApp(
     BlocProvider(
       create: (context) => QuizBloc()..add(LoadQuizEvent()),
-      child: const MaterialApp(
-          debugShowCheckedModeBanner: false, home: LoginPage()),
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
     ),
   );
 }
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
