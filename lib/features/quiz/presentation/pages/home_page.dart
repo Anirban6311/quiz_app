@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stream/features/authentication/presentation/pages/login_page.dart';
+import 'package:stream/features/quiz/presentation/pages/widgets/option_tile.dart';
 
-import 'bloc/quiz_bloc.dart'; // Import your QuizBloc, QuizEvent, and QuizState
+import '../bloc/quiz_bloc.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  void logout(BuildContext context) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('isLoggedIn', false);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Logged Out")));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellow,
       appBar: AppBar(
-        title: const Text('Quiz App'),
+        backgroundColor: Colors.orange,
+        title: const Text(
+          'Quiz App',
+          style: TextStyle(fontSize: 23, color: Colors.white),
+        ),
         centerTitle: true,
+        actions: [
+          ElevatedButton(
+            onPressed: () => logout(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue, // Button background color
+              foregroundColor: Colors.white, // Text and icon color
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: const Icon(Icons.logout),
+          )
+        ], // call back function is getting called instead of a return- function
       ),
       body: BlocBuilder<QuizBloc, QuizState>(
         builder: (context, state) {
@@ -32,12 +64,12 @@ class HomePage extends StatelessWidget {
                   Text(
                     'Question ${state.currentIndex + 1}',
                     style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+                        fontSize: 23, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     currentQuestion.question!,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 16),
                   ...options.map((option) => OptionTile(
@@ -50,6 +82,23 @@ class HomePage extends StatelessWidget {
                         },
                       )),
                   const Spacer(),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<QuizBloc>().add(SkipQuesEvent());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue, // Button background color
+                        foregroundColor: Colors.white, // Text and icon color
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                      ),
+                      child: const Text("Skip to next question"),
+                    ),
+                  )
                 ],
               ),
             );
@@ -61,7 +110,7 @@ class HomePage extends StatelessWidget {
                   Text(
                     state.isCorrect ? 'Correct!' : 'Wrong Answer!',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 26,
                       color: state.isCorrect ? Colors.green : Colors.red,
                     ),
                   ),
@@ -70,7 +119,16 @@ class HomePage extends StatelessWidget {
                     onPressed: () {
                       context.read<QuizBloc>().add(NextQuesEvent());
                     },
-                    child: const Text('Next Question'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Button background color
+                      foregroundColor: Colors.white, // Text and icon color
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                    ),
+                    child: const Text(
+                      'Next Question',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
@@ -100,38 +158,6 @@ class HomePage extends StatelessWidget {
           }
           return const Center(child: Text('Quiz is over'));
         },
-      ),
-    );
-  }
-}
-
-class OptionTile extends StatelessWidget {
-  final String option;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const OptionTile({
-    Key? key,
-    required this.option,
-    required this.isSelected,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey[200],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          option,
-          style: const TextStyle(fontSize: 16),
-        ),
       ),
     );
   }
