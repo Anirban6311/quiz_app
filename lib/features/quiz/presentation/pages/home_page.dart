@@ -117,26 +117,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      final state = context.read<QuizBloc>().state;
-
-                      if (state is QuizLoaded || state is QuizAnsChecked) {
-                        final currentState = state is QuizLoaded
-                            ? state
-                            : (state as QuizAnsChecked).quizState;
-
-                        if (currentState.currentIndex <
-                            currentState.questions.length - 1) {
-                          // Trigger Next Question event
-                          context.read<QuizBloc>().add(NextQuesEvent());
-                        } else {
-                          // Transition directly to QuizCompleted state
-                          final totalScore = currentState.score;
-                          context.read<QuizBloc>().emit(QuizCompleted(
-                                totalScored: totalScore,
-                                totalAnswered: currentState.questions.length,
-                              ));
-                        }
-                      }
+                      context.read<QuizBloc>().add(NextQuesEvent());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // Button background color
@@ -144,25 +125,9 @@ class HomePage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
                     ),
-                    child: Builder(
-                      builder: (context) {
-                        final state = context.watch<QuizBloc>().state;
-
-                        if (state is QuizLoaded || state is QuizAnsChecked) {
-                          final currentState = state is QuizLoaded
-                              ? state
-                              : (state as QuizAnsChecked).quizState;
-                          final isLastQuestion = currentState.currentIndex ==
-                              currentState.questions.length - 1;
-
-                          return Text(
-                            isLastQuestion ? 'End Quiz' : 'Next Question',
-                            style: const TextStyle(fontSize: 18),
-                          );
-                        }
-
-                        return const Text('Loading..');
-                      },
+                    child: const Text(
+                      'Next Question',
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
                 ],
@@ -175,25 +140,11 @@ class HomePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Your total score is ${totalScore.toString()}",
-                    style: const TextStyle(fontSize: 22),
-                  ),
+                  Text("Your total score is ${totalScore.toString()}"),
                   const SizedBox(
                     height: 40,
                   ),
-                  Text(
-                    "Your total score is ${totalAnswered.toString()}",
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        context.read<QuizBloc>().add(RestartQuizEvent());
-                      },
-                      child: const Text("Restart Quiz"))
+                  Text("Your total score is ${totalAnswered.toString()}"),
                 ],
               ),
             );
